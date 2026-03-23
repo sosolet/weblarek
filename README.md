@@ -1,3 +1,4 @@
+https://github.com/sosolet/weblarek
 # Проектная работа "Веб-ларек"
 
 Стек: HTML, SCSS, TS, Vite
@@ -98,3 +99,51 @@ Presenter - презентер содержит основную логику п
 `emit<T extends object>(event: string, data?: T): void` - инициализация события. При вызове события в метод передается название события и объект с данными, который будет использован как аргумент для вызова обработчика.  
 `trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void` - возвращает функцию, при вызове которой инициализируется требуемое в параметрах событие с передачей в него данных из второго параметра.
 
+#### Данные 
+- **Класс BasketModel**
+Класс, отвечающий за функционал корзины: чтение и запись товаров, удаление одного продукта, очистка всей корзины, получение полной стоимости товаров и получение количества товаров в корзине.
+
+Поля:
+  basketProducts: IProductItem[] - массив товаров в корзине.
+Методы:
+  get basketProducts(): IProductItem[] - получение массива товаров в корзине.
+  set basketProducts(data: IProductItem) - добавление товара в корзину.
+  deleteProduct(data: IProductItem): void - удаление одного товара из корзины.
+  clearBasket(): void - полная очистка корзины.
+  getTotalSum(): number - получение полной стоимости корзины.
+  getCountProducts(): number - получение количества товаров в корзине.
+  checkProduct(id: string): boolean - на входе получает id товара и проверяет, есть ли он в корзине.
+- **Класс BuyerModel**
+Класс, отвечающий за хранение, очистку и валидацию данных пользователя.
+
+Поля:
+  buyerInfo: IBuyer - информация о покупателе.
+Методы:
+  get buyerInfo(): IBuyer - получение информации о покупателе.
+  set buyerInfo(data: Partial<IBuyer>) - запись информации о покупателе, как полная, так и частичная. Сохраняет введённые значения.
+  clearBuyerInfo(): void - очищает данные пользователя.
+  validateBuyer(): TBuyerError[] - проверяет данные о пользователе, если поле пустое, возвращает массив с информацией об ошибке.
+- **Класс CatalogModel**
+Класс, отвечающий за хранение информации о всех товарах и подробной об одном из товаров.
+
+Поля:
+  catalogProducts: IProductItem[] - массив доступных для покупки товаров.
+  infoProduct: IProductItem | undefined - полная информация о выбранном товаре.
+Методы:
+  get catalogProducts(): IProductItem[] - получение полного списка товаров.
+  set catalogProducts(data: IProductItem[]) - запись полного списка товаров.
+  get infoProduct(): IProductItem | undefined - получение информации о выбранном товаре.
+  set infoProduct(data: IProductItem | undefined) - запись информации о выбранном товаре.
+  getProduct(id: string): IProductItem | undefined - получение товара по его id.
+
+#### Слой коммуникации
+**Класс ApiModel**
+Класс, наследуемый от Api. Нужен для взаимодействия с сервером.
+
+Поля:
+  cdn: string - url для контента
+  baseUrl: string - url для ipi
+  options?: RequestInit - опции
+Методы:
+  get ProductList(): Promise<IProductItem[]> - получает список товаров с сервера.
+  orderProducts(order: IOrder): Promise<IOrderResult> - отправляет заказ на сервер, возвращает статус опалаты.
