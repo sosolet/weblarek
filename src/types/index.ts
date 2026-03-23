@@ -1,9 +1,6 @@
 export type ApiPostMethods = "POST" | "PUT" | "DELETE";
 export type TPayment = "card" | "cash" | "";
-export type TBuyerError = {
-  valid: boolean;
-  messege: string;
-};
+export type TBuyerError = Partial<Record<keyof IBuyer, string>>;
 
 export interface IProductItem {
   id: string;

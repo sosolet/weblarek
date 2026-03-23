@@ -33,16 +33,13 @@ export class BuyerModel {
   }
 
   // Валидация данных о покупателе (Поля не пустые)
-  validateBuyer(): TBuyerError[] {
-    const dataValid: TBuyerError[] = []; 
+  validateBuyer(): TBuyerError {
+    const error: TBuyerError = {}; 
     (Object.keys(this.buyerInfo) as (keyof IBuyer)[]).forEach((val) => {
       if (!this.buyerInfo[val]) {
-        dataValid.push({
-          valid: false,
-          messege: `Поле ${val} должно быть заполнено!`
-        })
+        error[val] = `Необходимо заполнить поле ${val}`;
       }
     })
-    return dataValid;
+    return error;
   }
 }

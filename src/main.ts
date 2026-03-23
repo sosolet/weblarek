@@ -30,10 +30,10 @@ console.log('======| BasketModel |======');
 const basket = new BasketModel();
 
 // Добавление нескольких продуктов в корзину, проверка их наличия и вывод корзины
-basket.basketProducts = catalog.catalogProducts[0];
-basket.basketProducts = catalog.catalogProducts[1];
-basket.basketProducts = catalog.catalogProducts[2];
-basket.basketProducts = catalog.catalogProducts[2];
+basket.addBasketProducts(catalog.catalogProducts[0]);
+basket.addBasketProducts(catalog.catalogProducts[1]);
+basket.addBasketProducts(catalog.catalogProducts[2]);
+basket.addBasketProducts(catalog.catalogProducts[2]);
 console.log("Добавленные в корзину продукты: ", basket.basketProducts, "\n");
 
 // Удаление одной позиции из корзины
@@ -94,7 +94,7 @@ const api = new ApiModel(CDN_URL, API_URL);
 api.ProductList.then((data) => {
   // Запись и вывод товаров в класс CatalogModel
   catalog.catalogProducts = data;
-  console.log('Результат:', catalog.catalogProducts);
+  console.log('Следующие данные получены и записаны в CatalogModel:', catalog.catalogProducts);
 }).catch((error) => {
   console.error('Ошибка получения данных:', error);
 });

@@ -13,7 +13,7 @@ export class BasketModel {
   }
 
   // Запись в корзину
-  set basketProducts(data: IProductItem) {
+  addBasketProducts(data: IProductItem) {
     if (!this.checkProduct(data.id)) {
       this._basketProducts.push(data);
     }
@@ -41,12 +41,6 @@ export class BasketModel {
 
   // Проверка наличия продукта по id
   checkProduct(id: string): boolean {
-    let flag = false;
-    this.basketProducts.forEach((val) => {
-      if (val.id === id) {
-        flag = true;
-      }
-    });
-    return flag;
+    return this.basketProducts.some((val) => val.id === id);
   }
 } 
