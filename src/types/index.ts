@@ -21,15 +21,11 @@ export interface IBuyer {
   payment: TPayment;
 }
 
-export interface IApi {
-  get<T extends object>(uri: string): Promise<T>;
-  post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
-}
-
 export interface IProductListApi {
   total: number;
   items: IProductItem[];
 }
+
 export interface IOrder extends IBuyer {
   total: number;
   items: string[];
