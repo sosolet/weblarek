@@ -30,10 +30,10 @@ console.log('======| BasketModel |======');
 const basket = new BasketModel();
 
 // Добавление нескольких продуктов в корзину, проверка их наличия и вывод корзины
-basket.addBasketProducts(catalog.catalogProducts[0]);
-basket.addBasketProducts(catalog.catalogProducts[1]);
-basket.addBasketProducts(catalog.catalogProducts[2]);
-basket.addBasketProducts(catalog.catalogProducts[2]);
+basket.addBasketProduct(catalog.catalogProducts[0]);
+basket.addBasketProduct(catalog.catalogProducts[1]);
+basket.addBasketProduct(catalog.catalogProducts[2]);
+basket.addBasketProduct(catalog.catalogProducts[2]);
 console.log("Добавленные в корзину продукты: ", basket.basketProducts, "\n");
 
 // Удаление одной позиции из корзины

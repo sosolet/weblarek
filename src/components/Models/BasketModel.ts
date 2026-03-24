@@ -13,7 +13,7 @@ export class BasketModel {
   }
 
   // Запись в корзину
-  addBasketProducts(data: IProductItem) {
+  addBasketProduct(data: IProductItem) {
     if (!this.checkProduct(data.id)) {
       this._basketProducts.push(data);
     }
