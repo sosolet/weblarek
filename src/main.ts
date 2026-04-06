@@ -29,7 +29,7 @@ const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 const events = new EventEmitter();
 const api = new ApiModel(CDN_URL, API_URL);
 const catalogModel = new CatalogModel(events);
-const basketModel = new BasketModel(events);
+const basketModel = new BasketModel();
 const buyerModel = new BuyerModel();
 const modal = new Modal(modalContainer, events);
 const basket = new Basket(basketTemplate, events);
@@ -82,10 +82,11 @@ events.on('card:deletePosition', () => {
 
 // Модальное окно корзины
 events.on('basket:open', () => {
+  basket.basketCounter(basketModel.getCountProducts());
   basket.setTotalSum(basketModel.getCountProducts());
   basket.items = basketModel.basketProducts.map((item, index) => {
     const basketItem = new BasketProduct(cardBasketTemplate, events, {
-      onClick: () => events.emit('basket:basketProductDelete', item),
+      onClick: () => { events.emit('basket:basketProductDelete', item), events.emit('basket:open') },
     });
     return basketItem.render(item, index + 1);
   });

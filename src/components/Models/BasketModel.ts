@@ -1,10 +1,9 @@
 import { IProductItem } from '../../types';
-import { IEvents } from '../base/Events';
 
 export class BasketModel {
   protected _basketProducts: IProductItem[];
 
-  constructor(protected events: IEvents) {
+  constructor() {
     this._basketProducts = [];
   }
 
@@ -23,7 +22,6 @@ export class BasketModel {
   // Удаление позиции из корзины
   deleteProduct(data: IProductItem): void {
     this._basketProducts.splice(this._basketProducts.indexOf(data), 1);
-    this.events.emit('basket:open');
   }
 
   // Очистка корзины
