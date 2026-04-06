@@ -12,7 +12,7 @@ export interface IProductItem {
 }
 
 export interface IBuyer {
-  addres: string;
+  address: string;
   email: string;
   phone: string;
   payment: TPayment;
@@ -32,3 +32,7 @@ export interface IOrderResult {
   id: string;
   total: number;
 }
+
+export type IActions = {
+	onClick: () => void;
+};

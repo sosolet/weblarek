@@ -1,10 +1,11 @@
-import { IProductItem } from "../../types";
+import { IProductItem } from '../../types';
+import { IEvents } from '../base/Events';
 
 export class CatalogModel {
   protected _catalogProducts: IProductItem[];
   protected _infoProduct: IProductItem | undefined;
 
-  constructor() {
+  constructor(protected events: IEvents) {
     this._catalogProducts = [];
     this._infoProduct;
   }
@@ -27,6 +28,7 @@ export class CatalogModel {
   // Запись подробной информации о товаре
   set infoProduct(data: IProductItem | undefined) {
     this._infoProduct = data;
+    this.events.emit('modal:open', data);
   }
 
   // Получение продукта по id

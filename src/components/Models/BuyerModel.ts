@@ -1,11 +1,11 @@
-import { IBuyer, TBuyerError } from "../../types";
+import { IBuyer, TBuyerError } from '../../types';
 
 export class BuyerModel {
   protected _buyerInfo: IBuyer;
 
   constructor() {
     this._buyerInfo = {
-      addres: '',
+      address: '',
       email: '',
       phone: '',
       payment: ''
@@ -25,7 +25,7 @@ export class BuyerModel {
   // Очистка данных о покупателе
   clearBuyerInfo(): void {
     this._buyerInfo = {
-      addres: '',
+      address: '',
       email: '',
       phone: '',
       payment: ''

@@ -136,3 +136,8 @@ export function createElement<
     }
     return element;
 }
+
+// Установка цены
+export function createPrice(price: number | null): string {
+    return price === null ? 'Бесценно' : `${price} синапсов`;
+}

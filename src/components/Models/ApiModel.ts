@@ -1,5 +1,6 @@
 import { Api } from '../base/Api';
 import { IProductItem, IOrder, IOrderResult, IProductListApi } from '../../types';
+import { IEvents } from '../base/Events';
 
 export class ApiModel extends Api {
   cdn: string;
@@ -17,6 +18,10 @@ export class ApiModel extends Api {
         image: this.cdn + item.image
       }))
     );
+  }
+
+  emitProductsLoaded(events: IEvents): void {
+    events.emit('catalog:get');
   }
 
   // Отправка данных и получение результата оплаты
