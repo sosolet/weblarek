@@ -1,9 +1,10 @@
 import { IProductItem } from '../../types';
+import { IEvents } from '../base/Events';
 
 export class BasketModel {
   protected _basketProducts: IProductItem[];
 
-  constructor() {
+  constructor(protected events: IEvents) {
     this._basketProducts = [];
   }
 
@@ -17,16 +18,22 @@ export class BasketModel {
     if (!this.checkProduct(data.id)) {
       this._basketProducts.push(data);
     }
+    this.events.emit('basket:changed');
+    this.events.emit('header:changed');
   }
 
   // Удаление позиции из корзины
-  deleteProduct(data: IProductItem): void {
+  deleteBasketProduct(data: IProductItem): void {
     this._basketProducts.splice(this._basketProducts.indexOf(data), 1);
+    this.events.emit('basket:changed');
+    this.events.emit('header:changed');
   }
 
   // Очистка корзины
   clearBasket(): void {
     this._basketProducts = [];
+    this.events.emit('basket:changed');
+    this.events.emit('header:changed');
   }
 
   // Получение полной суммы коризны

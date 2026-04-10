@@ -18,6 +18,7 @@ export class CatalogModel {
   // Запись списка товаров
   set catalogProducts(data: IProductItem[]) {
     this._catalogProducts = data;
+    this.events.emit('catalog:get');
   }
 
   // Получение подробной информации о товаре

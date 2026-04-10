@@ -1,49 +1,66 @@
 import { Card } from './Card';
-import { IActions, IProductItem } from '../../types';
 import { IEvents } from '../base/Events';
-import { ensureElement, createPrice } from '../../utils/utils';
+import { ensureElement } from '../../utils/utils';
+import { CDN_URL } from '../../utils/constants';
 
 export class CardPreview extends Card {
   protected _cardPreviewText: HTMLParagraphElement;
   protected _cardPreviewButton: HTMLButtonElement;
-  protected _flag: boolean;
-
-  constructor(template: HTMLTemplateElement, protected events: IEvents, flag: boolean, actions?: IActions) {
-    super(template, events, actions);
-
-    this._cardPreviewText = ensureElement<HTMLParagraphElement>('.card__text', this._cardElement);
-    this._cardPreviewButton = ensureElement<HTMLButtonElement>('.card__button', this._cardElement);
-    this._flag = flag;
-    this._cardPreviewButton.addEventListener('click', () => { this.events.emit('card:addPosition') });
+  protected _cardCategory: HTMLSpanElement;
+  protected _cardImage: HTMLImageElement;
+  protected _categoryType = <Record<string, string>>{
+    'дополнительное': 'additional',
+    'софт-скил': 'soft',
+    'кнопка': 'button',
+    'хард-скил': 'hard',
+    'другое': 'other',
   }
 
-  isPriceless(price: number | null): string {
-    if(price) {
-      return 'Купить';
+  constructor(container: HTMLElement, protected events: IEvents) {
+    super(container, events);
+
+    this._cardPreviewText = ensureElement<HTMLParagraphElement>('.card__text', this.container);
+    this._cardPreviewButton = ensureElement<HTMLButtonElement>('.card__button', this.container);
+    this._cardCategory = ensureElement<HTMLSpanElement>('.card__category', this.container);
+    this._cardImage = ensureElement<HTMLImageElement>('.card__image', this.container);
+
+    this._cardPreviewButton.addEventListener('click', () => { events.emit('preview:toggle') });
+  }
+
+  set description(value: string) {
+    this._cardPreviewText.textContent = value;
+  }
+
+  set category(value: string) {
+    this._cardCategory.textContent = value;
+    this._cardCategory.className = `card__category card__category_${this._categoryType[value]}`;
+  }
+
+  set image(value: string) {
+    this._cardImage.src = CDN_URL + value;
+    this._cardImage.alt = this._cardTitle.textContent;
+  }
+
+  set price(value: number | null) {
+    super.price = value;
+    if (value) {
+      this._cardPreviewButton.removeAttribute('disabled');
+      this._cardPreviewButton.textContent = 'Купить';
     } else {
       this._cardPreviewButton.setAttribute('disabled', 'true')
-      return 'Недоступно';
+      this._cardPreviewButton.textContent = 'Недоступно';
     }
   }
 
-  inBasket(data: IProductItem, flag: boolean) {
-    if (flag) {
-      this._cardPreviewButton.addEventListener('click', () => { this.events.emit('card:deletePosition') });
-      return 'Удалить из корзины';
+  updateButton(status: boolean): void {
+    if (this._cardPreviewButton.disabled) {
+      return;
+    }
+
+    if (status) {
+      this._cardPreviewButton.textContent = 'Удалить из корзины';
     } else {
-      return this.isPriceless(data.price);
+      this._cardPreviewButton.textContent = 'Купить';
     }
-  }
-
-  render(data: IProductItem): HTMLElement {
-    this._cardCategory.textContent = data.category;
-    this._cardCategory.className = this.isCategory(data.category);
-    this._cardTitle.textContent = data.title;
-    this._cardImage.src = data.image;
-    this._cardImage.alt = this._cardTitle.textContent;
-    this._cardPrice.textContent = createPrice(data.price);
-    this._cardPreviewText.textContent = data.description;
-    this._cardPreviewButton.textContent = this.inBasket(data, this._flag);
-    return this._cardElement;
   }
 }

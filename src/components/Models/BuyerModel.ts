@@ -1,9 +1,10 @@
 import { IBuyer, TBuyerError } from '../../types';
+import { IEvents } from '../base/Events';
 
 export class BuyerModel {
   protected _buyerInfo: IBuyer;
 
-  constructor() {
+  constructor(protected events: IEvents) {
     this._buyerInfo = {
       address: '',
       email: '',
@@ -20,6 +21,7 @@ export class BuyerModel {
   // Запись данных, которых ещё нет о покупателе
   set buyerInfo(data: Partial<IBuyer>) {
     this._buyerInfo = { ...this._buyerInfo, ...data }
+    this.events.emit('buyer:changed');
   } 
 
   // Очистка данных о покупателе
@@ -30,6 +32,7 @@ export class BuyerModel {
       phone: '',
       payment: ''
     };
+    this.events.emit('buyer:clear');
   }
 
   // Валидация данных о покупателе (Поля не пустые)

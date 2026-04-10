@@ -1,31 +1,19 @@
-import { Api } from '../base/Api';
-import { IProductItem, IOrder, IOrderResult, IProductListApi } from '../../types';
-import { IEvents } from '../base/Events';
+import { ApiPostMethods, IApi, IApiModel, IOrder, IOrderResult, IProductListApi } from '../../types';
 
-export class ApiModel extends Api {
-  cdn: string;
+export class ApiModel implements IApiModel {
+  private api: IApi;
 
-  constructor(cdn: string, baseUrl: string, options?: RequestInit) {
-    super(baseUrl, options); 
-    this.cdn = cdn;
+  constructor(api: IApi) {
+    this.api = api;
   }
 
   // Получение данных
-  get ProductList(): Promise<IProductItem[]> {
-    return this.get<IProductListApi>('/product').then((data: IProductListApi) =>
-      data.items.map((item) => ({
-        ...item,
-        image: this.cdn + item.image
-      }))
-    );
-  }
-
-  emitProductsLoaded(events: IEvents): void {
-    events.emit('catalog:get');
+  getProductList(): Promise<IProductListApi> {
+    return this.api.get<IProductListApi>('/product/');
   }
 
   // Отправка данных и получение результата оплаты
-  orderProducts(order: IOrder): Promise<IOrderResult> {
-    return this.post<IOrderResult>('/order', order);
+  orderProducts(order: IOrder, method: ApiPostMethods = 'POST'): Promise<IOrderResult> {
+    return this.api.post<IOrderResult>('/order', order, method);
   }
 }

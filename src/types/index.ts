@@ -2,6 +2,16 @@ export type ApiPostMethods = "POST" | "PUT" | "DELETE";
 export type TPayment = "card" | "cash" | "";
 export type TBuyerError = Partial<Record<keyof IBuyer, string>>;
 
+export interface IApi {
+  get<T extends object>(uri: string): Promise<T>;
+  post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
+}
+
+export interface IApiModel {
+  getProductList(): Promise<IProductListApi>;
+  orderProducts(data: IOrder, method?: ApiPostMethods): Promise<IOrderResult>;
+}
+
 export interface IProductItem {
   id: string;
   title: string;

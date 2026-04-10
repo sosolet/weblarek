@@ -141,9 +141,9 @@ Presenter - презентер содержит основную логику п
   `_basketProducts: IProductItem[]` - массив товаров в корзине.
 Методы:
   `get basketProducts(): IProductItem[]` - получение массива товаров в корзине.
-  `addBasketProduct(data: IProductItem)` - добавление товара в корзину.
-  `deleteProduct(data: IProductItem): void` - удаление одного товара из корзины.
-  `clearBasket(): void` - полная очистка корзины.
+  `addBasketProduct(data: IProductItem)` - добавление товара в корзину и вызов событий перерисовки.
+  `deleteBasketProduct(data: IProductItem): void` - удаление одного товара из корзины и вызов событий перерисовки.
+  `clearBasket(): void` - полная очистка корзины и вызов событий перерисовки.
   `getTotalSum(): number` - получение полной стоимости корзины.
   `getCountProducts(): number` - получение количества товаров в корзине.
   `checkProduct(id: string): boolean` - на входе получает id товара и проверяет, есть ли он в корзине.
@@ -151,13 +151,13 @@ Presenter - презентер содержит основную логику п
 **Класс BuyerModel**
 
 Класс, отвечающий за хранение, очистку и валидацию данных пользователя.
-
+  
 Поля:
   `_buyerInfo: IBuyer` - информация о покупателе.
 Методы:
   `get buyerInfo(): IBuyer` - получение информации о покупателе.
-  `set buyerInfo(data: Partial<IBuyer>)` - запись информации о покупателе, как полная, так и частичная. Сохраняет введённые значения.
-  `clearBuyerInfo(): void` - очищает данные пользователя.
+  `set buyerInfo(data: Partial<IBuyer>)` - запись информации о покупателе, как полная, так и частичная. Сохраняет введённые значения и вызов перерисовки форм.
+  `clearBuyerInfo(): void` - очищает данные пользователя и и вызов очиски форм.
   `validateBuyer(): TBuyerError[]` - проверяет данные о пользователе, если поле пустое, возвращает массив с информацией об ошибке.
 
 **Класс CatalogModel**
@@ -169,7 +169,7 @@ Presenter - презентер содержит основную логику п
   `_infoProduct: IProductItem | undefined` - полная информация о выбранном товаре.
 Методы:
   `get catalogProducts(): IProductItem[]` - получение полного списка товаров.
-  `set catalogProducts(data: IProductItem[])` - запись полного списка товаров.
+  `set catalogProducts(data: IProductItem[])` - запись полного списка товаров и вызов события записи данных.
   `get infoProduct(): IProductItem | undefined` - получение информации о выбранном товаре.
   `set infoProduct(data: IProductItem | undefined)` - запись информации о выбранном товаре и триггер события.
   `getProduct(id: string): IProductItem | undefined` - получение товара по его id.
@@ -178,16 +178,13 @@ Presenter - презентер содержит основную логику п
 
 **Класс ApiModel**
 
-Класс, наследуемый от Api. Нужен для взаимодействия с сервером.
+Класс, ипользующий интефейс IApi. Нужен для взаимодействия с сервером.
 
 Поля:
-  `cdn: string` - url для контента
-  `baseUrl: string` - url для ipi
-  `options?: RequestInit` - опции
+  `private api: IApi` - экземпляр класса с ссылкой.
 Методы:
-  `get ProductList(): Promise<IProductItem[]>` - получает список товаров с сервера.
-  `emitProductsLoaded(events: IEvents): void` - триггерит событие отображения карточек.
-  `orderProducts(order: IOrder): Promise<IOrderResult>` - отправляет заказ на сервер, возвращает статус опалаты.
+  `getProductList(): Promise<IProductListApi>` - получает список товаров с сервера.
+  `orderProducts(order: IOrder, method: ApiPostMethods = 'POST'): Promise<IOrderResult>` - отправляет заказ на сервер, возвращает статус опалаты.
 
 #### Классы View
 
@@ -196,116 +193,145 @@ Presenter - презентер содержит основную логику п
 Класс формироания модального окна корзины.
 
 Поля:
-  `_basket: HTMLElement` - шаблон корзины.
   `_title: HTMLHeadingElement` - элемент названия корзины.
   `_basketList: HTMLUListElement` - элемент списка корзины.
   `_button: HTMLButtonElement` - элемент кнопки корзины.
   `_basketPrice: HTMLSpanElement` - элемент цены корзины.
-  `_headerBasketButton: HTMLButtonElement` - кнопка открытия корзины.
-  `_headerBasketCounter: HTMLSpanElement` - элемент счётчика кнопки открытия корзины.
 Методы:
   `set items(items: HTMLElement[])` - отображение корзины в зависимости от добавленных позиций.
-  `basketCounter(value: number): void` - установка числа товаров в корзине.
   `setTotalSum(totalSum: number): void` - установка строки цены товаров.
-  `render(): HTMLElement` - итоговый html корзины.
-
-**Класс BasketProduct**
-
-Класс, формирующий товары в корзине.
-
-Поля:
-  `_basketItem: HTMLElement` - шаблон элемента.
-	`_index: HTMLSpanElement` - элемент номера товара.
-	`_title: HTMLSpanElement` - элемент названия товара.
-	`_price: HTMLSpanElement` - элемент цены товара.
-	`_buttonDelete: HTMLButtonElement` - кнопка удаления товара.
-Методы:
-  `render(): HTMLElement` - итоговый html товара в корзине.
 
 **Класс Card**
 
-Класс, формирующий карточки товаров.
+Класс - родитель всех карточек товаров.
 
 Поля:
-  `_cardElement: HTMLButtonElement` - шаблон карточки.
-  `_cardCategory: HTMLSpanElement` - элемент категории карточки.
-  `_cardTitle: HTMLHeadingElement` - элемент названия карточки.
-  `_cardImage: HTMLImageElement` - элемент изображения карточки.
-  `_cardPrice: HTMLSpanElement` - элемент цены карточки.
-  `_categoryType = <Record<string, string>>{
+  `protected _cardTitle: HTMLHeadingElement` - элемент названия товара;
+  `protected _cardPrice: HTMLSpanElement` - элемент цены товара;
+Методы:
+  `set title(value: string)` - метод записи названия товара.
+  `set price(value: number | null)`- метод записи цены товара.
+
+**Класс CardBasket**
+
+Класс, формирующий карточки товаров в корзине.
+
+Поля:
+  `protected _index: HTMLSpanElement` - элемент номера карточки товара в корзине.
+  `protected _buttonDelete: HTMLButtonElement` - кнопка удаления товара из корзины.
+Методы:
+  `set index(value: number)` - метод установки порядкового номера товара в корзине.
+
+**Класс CardCatalog**
+
+Класс, формирующий карточки товаров на странице.
+
+Поля:
+  `protected _cardCategory: HTMLSpanElement` - элемент категории товара
+  `protected _cardImage: HTMLImageElement` - элемент изображения товара.
+  `protected _categoryType = <Record<string, string>>{
     'дополнительное': 'additional',
     'софт-скил': 'soft',
     'кнопка': 'button',
     'хард-скил': 'hard',
     'другое': 'other',
-  }` - вспомогательное поле для класса категории.
+  }` - шаблон категории товара.
 Методы:
-  `isCategory(category: string): string` - формирование класса на основе катгории.
-  `render(): HTMLElement` - итоговый html карточки товара.
+  `set category(value: string)` - установка категории товара.
+  `set image(value: string)` - установка изображения товара.
 
 **Класс CardPreview**
 
-Класс, формирующий модальное окно карточки товара. Наследуется от Card.
+Класс, формирующий контент модального окна карточки товара.
 
 Поля:
-  `_cardPreviewText: HTMLParagraphElement` - элемент описания карточки.
-  `_cardPreviewButton: HTMLButtonElement` - кнопка покупки/удаления элемента из корзины.
-  `_flag: boolean` - поле наличия элемента в корзине.
+  `protected _cardPreviewText: HTMLParagraphElement` - элемент описания товара.
+  `protected _cardPreviewButton: HTMLButtonElement` - элемент кнопки покупки товара.
+  `protected _cardCategory: HTMLSpanElement` - элемент категории товара
+  `protected _cardImage: HTMLImageElement` - элемент изображения товара.
+  `protected _categoryType = <Record<string, string>>{
+    'дополнительное': 'additional',
+    'софт-скил': 'soft',
+    'кнопка': 'button',
+    'хард-скил': 'hard',
+    'другое': 'other',
+  }` - - шаблон категории товара.
 Методы:
-  `isPriceless(price: number | null): string` - установка возможности покупки товара.
-  `inBasket(data: IProductItem, flag: boolean)` - проверка наличия товара в корзине.
-  `render(data: IProductItem): HTMLElement` - итоговый html модального окна карточки.
+  `set description(value: string)` - установка описания товара.
+  `set category(value: string)` - установка категории товара.
+  `set image(value: string)` - установка картинки товара.
+  `set price(value: number | null)` - установка цены товара.
+  `updateButton(status: boolean): void` - установка текста кнопки, зависящая от наличия в корзине.
 
 **Класс Contacts**
 
-Класс, формирующий модальное окно ввода контактных данных (почта, номер телефона).
+Класс, формирующий форму для записи контактных данных.
 
 Поля:
-  `_formContacts: HTMLFormElement` - шаблон модального окна контактов.
-  `_inputAll: HTMLInputElement[]` - инпуты контактов.
-  `_buttonSubmit: HTMLButtonElement` - кнопка оформления заказа.
-  `_formErrors: HTMLSpanElement` - элемент описания ошибок.
+  `protected _inputAll: HTMLInputElement[]` - элементы полей ввода
 Методы:
-  `set valid(value: boolean)` - блокировка/разблокировка кнопки.
-  `set formErrors(error: string)` - формирование текста ошибки.
-  `render(): HTMLElement` - итоговый html модального окна контактной информации.
+  `clearContacts(): void` - очистка полей ввода.
+
+**Класс Form**
+
+Класс - родитель всех форм.
+
+Поля:
+  `protected _formErrors: HTMLElement` - элемент для ошибок.
+  `protected _buttonSubmit: HTMLButtonElement` - элемент кнопки сохранения данных и перехода к следующему этапу.
+Методы:
+  `set valid(value: boolean)` - метод разблокировки кнопки перехода.
+  `set formErrors(error: string)` - метод фотображения ошибок.
+
+**Класс Gallery**
+
+Класс, отображающий карточки товаров на странице.
+
+Поля:
+  `items = []` - карточки товаров.
+Методы:
+  `set items(items: HTMLElement[])` - метод записи карточек в галлерею. 
+
+**Класс Header**
+
+Класс, отображающий кнопку корзины и счётчик.
+
+Поля:
+  `protected _headerBasketButton: HTMLButtonElement` - элемент кнопки корзины.
+  `protected _headerBasketCounter: HTMLSpanElement` - элемент со счётчиком корзины.
+Методы:
+  `basketCounter(value: number): void` - установка значения счётчика.
 
 **Класс Modal**
 
 Класс, формирующий модальные окна.
 
-Поля:
-  `_modalContainer: HTMLElement` - контейнер модального окна.
-  `_closeButton: HTMLButtonElement` - кнопка закрытия модального окна.
-  `_content: HTMLElement` - содержимое модального окна.
-Методы:
-  `set content(value: HTMLElement)` - получение содержимого модального окна.
-  `open(): void` - открытие модального окна.
-  `close(): void` - закрытие модального окна.
-  `render(): HTMLElement` - формирование html модального окна.
+Поля: 
+  `_closeButton: HTMLButtonElement` - кнопка закрытия модального окна. 
+  `_content: HTMLElement` - содержимое модального окна. 
+Методы: 
+  `set content(value: HTMLElement)` - получение содержимого модального окна. 
+  `open(): void` - открытие модального окна. 
+  `close(): void` - закрытие модального окна. 
 
 **Класс Order**
 
-Класс, формирующий модальное окно ввода данных по заказу (адрес, способ оплаты).
+Класс, формирующий форму для записи данных о заказе.
 
-Поля:
-  `_formOrder: HTMLFormElement` - шаблон модального окна данных по заказу.
-  `_buttonAll: HTMLButtonElement[]` - кнопки выбора способа оплаты.
-  `_buttonSubmit: HTMLButtonElement` - кнопка продолжения оформления заказа.
-  `_formErrors: HTMLElement` - элемент описания ошибок.
-Методы:
-  `set paymentSelection(paymentMethod: string)`
-  `set valid(value: boolean)` - блокировка/разблокировка кнопки.
-  `set formErrors(error: string)` - формирование текста ошибки.
-  `render(): HTMLElement` - итоговый html модального окна ввода данных по заказу.
+Поля: 
+  `protected _buttonAll: HTMLButtonElement[]` - кнопки оплаты.
+  `protected _input: HTMLInputElement` - поле адреса.
+Методы: 
+  `set paymentSelection(paymentMethod: string)` - получение значения способа оплаты.
+  `clearOrder(): void` - очистка полей формы.
 
 **Класс Success**
 
-Класс, формирующий модальное окно успешно оформленного заказа.
+Класс, формирующий форму для записи данных о заказе.
 
-Поля:
-  `_success: HTMLElement` - шаблон модального окна успешного заказа.
-  `_description: HTMLParagraphElement` - описание заказа (списанная сумма).
-  `_button: HTMLButtonElement` - кнопка закрытия.
-Методы:
-  `render(total: number): HTMLElement` - итоговый html модального окна оформленного заказа.
+Поля: 
+  `protected _description: HTMLParagraphElement` - описание успешнго заказа.
+  `protected _button: HTMLButtonElement` - кнопка закрытия окна успешного заказа.
+Методы: 
+  `set description(total: number)` - запись ответа сервера.
+  

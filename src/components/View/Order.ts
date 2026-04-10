@@ -1,34 +1,31 @@
 import { IEvents } from '../base/Events';
-import { cloneTemplate, ensureElement, ensureAllElements } from '../../utils/utils';
+import { ensureElement, ensureAllElements } from '../../utils/utils';
+import { Form } from './Form';
 
-export class Order {
-  protected _formOrder: HTMLFormElement;
+export class Order extends Form {
   protected _buttonAll: HTMLButtonElement[];
-  protected _buttonSubmit: HTMLButtonElement;
-  protected _formErrors: HTMLElement;
+  protected _input: HTMLInputElement;
 
-  constructor(template: HTMLTemplateElement, protected events: IEvents) {
-    this._formOrder = cloneTemplate<HTMLFormElement>(template);
-    this._buttonAll = Array.from(ensureAllElements<HTMLButtonElement>('.button_alt', this._formOrder));
-    this._buttonSubmit = ensureElement<HTMLButtonElement>('.order__button', this._formOrder);
-    this._formErrors = ensureElement<HTMLSpanElement>('.form__errors', this._formOrder);
+  constructor(container: HTMLElement, protected events: IEvents) {
+    super(container, events);
+    this._buttonAll = Array.from(ensureAllElements<HTMLButtonElement>('.button_alt', this.container));
+    this._input = ensureElement<HTMLInputElement>('input', this.container);
 
     this._buttonAll.forEach(item => {
-      item.addEventListener('click', () => {
-        this.paymentSelection = item.name;
-        events.emit('order:paymentSelection', item);
-        events.emit('formErrors:order');
+      item.addEventListener('click', (event: Event) => {
+        const target = event.target as HTMLButtonElement;
+        const value = target.name;
+        events.emit('order:paymentSelection', { payment: value });
       });
     });
 
-    this._formOrder.addEventListener('input', (event: Event) => {
+    this._input.addEventListener('input', (event: Event) => {
       const target = event.target as HTMLInputElement;
       const value = target.value;
       events.emit('order:changeAddress', { address: value });
-      events.emit('formErrors:order');
     });
 
-    this._formOrder.addEventListener('submit', (event: Event) => {
+    this.container.addEventListener('submit', (event: Event) => {
       event.preventDefault();
       this.events.emit('contacts:open');
     });
@@ -40,15 +37,7 @@ export class Order {
     })
   }
 
-  set valid(value: boolean) {
-    this._buttonSubmit.disabled = !value;
-  }
-
-  set formErrors(error: string) {
-    this._formErrors.textContent = error;
-  }
-
-  render(): HTMLElement {
-    return this._formOrder;
+  clearOrder(): void {
+    this._input.value = '';
   }
 }

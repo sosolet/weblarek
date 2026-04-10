@@ -1,19 +1,25 @@
 import { IEvents } from '../base/Events';
 import { ensureElement } from '../../utils/utils';
+import { Component } from '../base/Component';
 
-export class Modal {
-  protected _modalContainer: HTMLElement;
+export interface IModalView {
+  content(value: HTMLElement): void;
+  open(): void;
+  close(): void;
+}
+
+export class Modal extends Component<IModalView> {
   protected _closeButton: HTMLButtonElement;
   protected _content: HTMLElement;
   
-  constructor(modalContainer: HTMLElement, protected events: IEvents) {
-    this._modalContainer = modalContainer;
-    this._closeButton = ensureElement<HTMLButtonElement>('.modal__close', this._modalContainer);
-    this._content = ensureElement<HTMLElement>('.modal__content', this._modalContainer);
+  constructor(container: HTMLElement, protected events: IEvents) {
+    super(container);
+    this._closeButton = ensureElement<HTMLButtonElement>('.modal__close', this.container);
+    this._content = ensureElement<HTMLElement>('.modal__content', this.container);
 
     this._closeButton.addEventListener('click', this.close.bind(this));
-    this._modalContainer.addEventListener('click', this.close.bind(this));
-    ensureElement<HTMLElement>('.modal__container', this._modalContainer).addEventListener('click', event => event.stopPropagation());
+    this.container.addEventListener('click', this.close.bind(this));
+    ensureElement<HTMLElement>('.modal__container', this.container).addEventListener('click', event => event.stopPropagation());
   }
 
   set content(value: HTMLElement) {
@@ -21,17 +27,12 @@ export class Modal {
   }
 
   open(): void {
-    this._modalContainer.classList.add('modal_active');
+    this.container.classList.add('modal_active');
     this.events.emit('modal:open');
   }
 
   close(): void {
-    this._modalContainer.classList.remove('modal_active');
+    this.container.classList.remove('modal_active');
     this.events.emit('modal:close');
-  }
-
-  render(): HTMLElement {
-    this.open();
-    return this._modalContainer;
   }
 }
