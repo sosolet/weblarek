@@ -24,9 +24,11 @@ export class Contacts extends Form {
     });
   }
 
-  clearContacts(): void {
-    this._inputAll.forEach(item => {
-      item.value = '';
-    })
+  set email(value: string) {
+    this._inputAll[0].value = value;
+  }
+
+  set phone(value: string) {
+    this._inputAll[1].value = value;
   }
 }

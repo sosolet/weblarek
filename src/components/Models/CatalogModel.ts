@@ -29,7 +29,7 @@ export class CatalogModel {
   // Запись подробной информации о товаре
   set infoProduct(data: IProductItem | undefined) {
     this._infoProduct = data;
-    this.events.emit('modal:open', data);
+    this.events.emit('cardPreview:open', data);
   }
 
   // Получение продукта по id

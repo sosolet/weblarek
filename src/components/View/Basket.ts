@@ -19,7 +19,7 @@ export class Basket extends Component<IBasketView> {
     this._button = ensureElement<HTMLButtonElement>('.basket__button', this.container); 
     this._basketPrice = ensureElement<HTMLSpanElement>('.basket__price', this.container);
     
-    this._button.addEventListener('click', () => { this.events.emit('order:open') });
+    this._button.addEventListener('click', () => { events.emit('order:open'), events.emit('buyer:changed') });
 
     this.items = [];
     this._title.textContent = 'Корзина';

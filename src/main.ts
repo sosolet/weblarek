@@ -68,7 +68,7 @@ events.on('card:select', (item: IProductItem) => {
 });
 
 // Модальное окно карточки товара
-events.on('modal:open', (item: IProductItem) => {
+events.on('cardPreview:open', (item: IProductItem) => {
   cardPreview.description = item.description;
   cardPreview.category = item.category;
   cardPreview.title = item.title;
@@ -86,18 +86,11 @@ events.on('preview:toggle', () => {
   if (product) {
     if (basketModel.checkProduct(product.id)) {
       basketModel.deleteBasketProduct(product);
-      cardPreview.updateButton(false);
     } else {
       basketModel.addBasketProduct(product);
-      cardPreview.updateButton(true);
     }
   }
   modal.close();
-});
-
-// Изменение кнопки корзины
-events.on('header:changed', () => {
-  header.basketCounter(basketModel.getCountProducts());
 });
 
 // Изменения корзины 
@@ -111,6 +104,7 @@ events.on('basket:changed', () => {
     basketItem.price = item.price;
     return basketItem.render();
   });
+  header.basketCounter(basketModel.getCountProducts());
   basket.setTotalSum(basketModel.getTotalSum());
 });
 
@@ -123,7 +117,6 @@ events.on('basket:open', () => {
 
 // Удаление позиции из корзины
 events.on('basket:basketProductDelete', (item: IProductItem) => {
-  cardPreview.updateButton(basketModel.checkProduct(item.id));
   basketModel.deleteBasketProduct(item);
 });
 
@@ -160,7 +153,9 @@ events.on('contacts:contactsInput', (data: { field: string, value: string }) => 
   }
 });
 
+// Изменение форм
 events.on('buyer:changed', () => {
+  const buyerData = buyerModel.buyerInfo;
   const errors = buyerModel.validateBuyer();
   
   order.formErrors = Object.values({ 
@@ -178,6 +173,11 @@ events.on('buyer:changed', () => {
   
   order.valid = isOrderValid;
   contacts.valid = isContactsValid;
+
+  order.address = buyerData.address;
+  order.payment = buyerData.payment;
+  contacts.email = buyerData.email;
+  contacts.phone = buyerData.phone;
 });
 
 // Оформление покупки
@@ -200,14 +200,9 @@ events.on('success:open', () => {
     .catch(error => console.log(error));
 });
 
+// Закртиые результата заказа
 events.on('success:close', () => {
   modal.close()
-});
-
-events.on('buyer:clear', () => {
-  order.valid = false;
-  contacts.clearContacts();
-  order.clearOrder();
 });
 
 // Получение данных с сервера

@@ -270,7 +270,8 @@ Presenter - презентер содержит основную логику п
 Поля:
   `protected _inputAll: HTMLInputElement[]` - элементы полей ввода
 Методы:
-  `clearContacts(): void` - очистка полей ввода.
+  `set email(value: string)` - установка значения почты.
+  `set phone(value: string)` - установка значения телефона.
 
 **Класс Form**
 
@@ -323,7 +324,8 @@ Presenter - презентер содержит основную логику п
   `protected _input: HTMLInputElement` - поле адреса.
 Методы: 
   `set paymentSelection(paymentMethod: string)` - получение значения способа оплаты.
-  `clearOrder(): void` - очистка полей формы.
+  `set payment(value: string | null)` - установка выбора оплаты.
+  `set address(value: string)` - установка значения адреса.
 
 **Класс Success**
 

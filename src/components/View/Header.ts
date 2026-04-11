@@ -15,7 +15,7 @@ export class Header extends Component<HeaderView> {
     this._headerBasketButton = ensureElement<HTMLButtonElement>('.header__basket', this.container);
     this._headerBasketCounter = ensureElement<HTMLSpanElement>('.header__basket-counter', this.container);
 
-    this._headerBasketButton.addEventListener('click', () => { this.events.emit('basket:open') });
+    this._headerBasketButton.addEventListener('click', () => { events.emit('basket:open') });
   }
 
   basketCounter(value: number): void {

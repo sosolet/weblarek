@@ -37,7 +37,12 @@ export class Order extends Form {
     })
   }
 
-  clearOrder(): void {
-    this._input.value = '';
+  set payment(value: string | null) {
+    this._buttonAll[0].classList.toggle('button_alt-active', value === 'card');
+    this._buttonAll[1].classList.toggle('button_alt-active', value === 'cash');
+  }
+
+  set address(value: string) {
+    this._input.value = value;
   }
 }

@@ -26,14 +26,12 @@ export class BasketModel {
   deleteBasketProduct(data: IProductItem): void {
     this._basketProducts.splice(this._basketProducts.indexOf(data), 1);
     this.events.emit('basket:changed');
-    this.events.emit('header:changed');
   }
 
   // Очистка корзины
   clearBasket(): void {
     this._basketProducts = [];
     this.events.emit('basket:changed');
-    this.events.emit('header:changed');
   }
 
   // Получение полной суммы коризны
